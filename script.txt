@@ -1,0 +1,18 @@
+ssh-keygen
+sudo apt update && sudo apt install awscli -y
+
+aws configure
+
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x ./kubectl
+sudo mv kubectl /usr/local/bin/
+
+wget https://github.com/kubernetes/kops/releases/download/v1.26.4/kops-linux-amd64
+chmod +x kops-linux-arm64
+sudo mv kops-linux-amd64 /usr/local/bin/kops
+
+kops create cluster --name=vpro.cloudujjwal.com --state=s3://vprofile-kops-ujjwal --cloud=aws --zones=us-east-2a,us-east-2b --node-count=2 --node-size=t3.small --master-size=t3.medium --dns-zone=vpro.cloudujjwal.com --node-volume-size=8 --master-volume-size=12
+nslookup -type=ns vpro.cloudujjwal.com
+kops update cluster --name vpro.cloudujjwal.com --state=s3://vprofile-kops-ujjwal --yes --admin
+kops validate cluster --state=s3://vprofile-kops-ujjwal
+kops delete cluster --name=vpro.cloudujjwal.com --state=s3://vprofile-kops-ujjwal --yes
